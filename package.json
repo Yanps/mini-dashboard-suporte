@@ -1,0 +1,21 @@
+{
+  "name": "mini-dashboard-suporte",
+  "version": "1.0.0",
+  "description": "Mini Dashboard de Suporte - Sistema de tickets com backend NestJS, admin Angular e cliente React",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../admin && npm install --legacy-peer-deps && cd ../client && npm install",
+    "install:all:force": "npm install && cd backend && npm install --force && cd ../admin && npm install --force && cd ../client && npm install --force",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:admin": "cd admin && NODE_OPTIONS=\"--openssl-legacy-provider\" npm start",
+    "dev:client": "cd client && NODE_OPTIONS=\"--openssl-legacy-provider\" PORT=3001 npm start",
+    "build:all": "cd backend && npm run build && cd ../admin && npm run build && cd ../client && npm run build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": ["nestjs", "angular", "react", "mongodb", "tickets", "dashboard"],
+  "author": "",
+  "license": "MIT"
+}
+
+

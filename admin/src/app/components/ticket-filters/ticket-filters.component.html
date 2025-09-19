@@ -1,0 +1,75 @@
+<mat-card class="filters-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>filter_list</mat-icon>
+      Filtros
+    </mat-card-title>
+    <div class="spacer"></div>
+    <button 
+      mat-button 
+      color="warn" 
+      (click)="clearFilters()" 
+      [disabled]="!hasActiveFilters()"
+      matTooltip="Limpar todos os filtros">
+      <mat-icon>clear</mat-icon>
+      Limpar
+    </button>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <form [formGroup]="filterForm" class="filters-form">
+      <div class="filters-row">
+        <!-- Search -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Buscar</mat-label>
+          <input matInput 
+                 formControlName="search" 
+                 placeholder="Título ou descrição">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <!-- Status -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Priority -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Prioridade</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option *ngFor="let option of priorityOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filters-row">
+        <!-- Requester Email -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Email do Solicitante</mat-label>
+          <input matInput 
+                 formControlName="requesterEmail" 
+                 placeholder="email@exemplo.com">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+
+        <!-- Assigned To -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Responsável</mat-label>
+          <input matInput 
+                 formControlName="assignedTo" 
+                 placeholder="Nome do responsável">
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+

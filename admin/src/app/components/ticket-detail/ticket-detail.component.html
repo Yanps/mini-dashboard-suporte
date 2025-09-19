@@ -1,0 +1,184 @@
+<div class="ticket-detail-container">
+  <!-- Header -->
+  <div class="detail-header">
+    <button mat-icon-button (click)="goBack()" matTooltip="Voltar">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Detalhes do Ticket</h1>
+    <div class="spacer"></div>
+    <button mat-raised-button 
+            color="warn" 
+            (click)="deleteTicket()" 
+            [disabled]="!ticket"
+            matTooltip="Excluir ticket">
+      <mat-icon>delete</mat-icon>
+      Excluir
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Ticket Details -->
+  <div *ngIf="ticket && !loading" class="ticket-content">
+    
+    <!-- Basic Information -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Informações Básicas
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>ID:</label>
+            <span>{{ ticket._id }}</span>
+          </div>
+          <div class="info-item">
+            <label>Título:</label>
+            <span>{{ ticket.title }}</span>
+          </div>
+          <div class="info-item">
+            <label>Solicitante:</label>
+            <span>
+              <mat-icon class="inline-icon">email</mat-icon>
+              {{ ticket.requesterEmail }}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Criado em:</label>
+            <span>{{ formatDate(ticket.createdAt) }}</span>
+          </div>
+          <div class="info-item">
+            <label>Atualizado em:</label>
+            <span>{{ formatDate(ticket.updatedAt) }}</span>
+          </div>
+          <div class="info-item" *ngIf="ticket.resolvedAt">
+            <label>Resolvido em:</label>
+            <span>{{ formatDate(ticket.resolvedAt) }}</span>
+          </div>
+          <div class="info-item" *ngIf="ticket.closedAt">
+            <label>Fechado em:</label>
+            <span>{{ formatDate(ticket.closedAt) }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Description -->
+    <mat-card class="description-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>description</mat-icon>
+          Descrição
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="description-content">
+          {{ ticket.description }}
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Update Form -->
+    <mat-card class="update-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>edit</mat-icon>
+          Atualizar Ticket
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="update-form">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                  <mat-chip [class]="'status-chip ' + option.value">
+                    {{ option.label }}
+                  </mat-chip>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Prioridade</mat-label>
+              <mat-select formControlName="priority">
+                <mat-option *ngFor="let option of priorityOptions" [value]="option.value">
+                  <mat-chip [class]="'priority-chip ' + option.value">
+                    {{ option.label }}
+                  </mat-chip>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Responsável</mat-label>
+              <input matInput formControlName="assignedTo" placeholder="Nome do responsável">
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-raised-button 
+                    color="primary" 
+                    type="submit" 
+                    [disabled]="updateForm.invalid || updating">
+              <mat-icon>save</mat-icon>
+              {{ updating ? 'Salvando...' : 'Salvar Alterações' }}
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- History -->
+    <mat-card class="history-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Histórico de Alterações
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="ticket.history.length === 0" class="no-history">
+          Nenhuma alteração registrada.
+        </div>
+        
+        <mat-expansion-panel *ngFor="let entry of ticket.history; trackBy: trackByIndex" class="history-entry">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="history-icon">{{ getHistoryIcon(entry.action) }}</mat-icon>
+              {{ getHistoryActionLabel(entry.action) }}
+            </mat-panel-title>
+            <mat-panel-description>
+              {{ formatDate(entry.timestamp) }}
+              <span *ngIf="entry.changedBy" class="changed-by">por {{ entry.changedBy }}</span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          
+          <div class="history-details">
+            <div *ngIf="entry.oldValue" class="history-change">
+              <strong>De:</strong> {{ entry.oldValue }}
+            </div>
+            <div *ngIf="entry.newValue" class="history-change">
+              <strong>Para:</strong> {{ entry.newValue }}
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>
+

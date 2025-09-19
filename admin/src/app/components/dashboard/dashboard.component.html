@@ -1,0 +1,96 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <button mat-raised-button color="primary" (click)="refresh()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Atualizar
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="stats && !loading" class="stats-container">
+    <!-- Total Tickets -->
+    <mat-card class="stats-card total-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>confirmation_number</mat-icon>
+          Total de Tickets
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ stats.total }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Status Statistics -->
+    <mat-card class="stats-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>assessment</mat-icon>
+          Por Status
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-grid">
+          <div *ngFor="let item of getStatusEntries()" class="stat-item">
+            <mat-chip [class]="'status-chip ' + item.key">{{ item.label }}</mat-chip>
+            <span class="stat-number">{{ item.value }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Priority Statistics -->
+    <mat-card class="stats-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>priority_high</mat-icon>
+          Por Prioridade
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-grid">
+          <div *ngFor="let item of getPriorityEntries()" class="stat-item">
+            <mat-chip [class]="'priority-chip ' + item.key">{{ item.label }}</mat-chip>
+            <span class="stat-number">{{ item.value }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Quick Actions -->
+  <mat-card class="quick-actions-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>flash_on</mat-icon>
+        Ações Rápidas
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="quick-actions">
+        <button mat-raised-button color="primary" routerLink="/tickets">
+          <mat-icon>list</mat-icon>
+          Ver Todos os Tickets
+        </button>
+        <button mat-raised-button color="accent" routerLink="/tickets" [queryParams]="{status: 'open'}">
+          <mat-icon>new_releases</mat-icon>
+          Tickets Abertos
+        </button>
+        <button mat-raised-button color="warn" routerLink="/tickets" [queryParams]="{priority: 'urgent'}">
+          <mat-icon>warning</mat-icon>
+          Tickets Urgentes
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+

@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:5.0
+    container_name: mini-dashboard-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: mini-dashboard-suporte
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - mini-dashboard-network
+
+  # Backend NestJS
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mini-dashboard-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/mini-dashboard-suporte?authSource=admin
+      - PORT=3000
+      - CORS_ORIGIN=http://localhost:4200,http://localhost:3001
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - mini-dashboard-network
+
+  # Admin Angular
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: mini-dashboard-admin
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    networks:
+      - mini-dashboard-network
+
+  # Client React
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: mini-dashboard-client
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost:3000
+      - REACT_APP_WS_URL=http://localhost:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - mini-dashboard-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  mini-dashboard-network:
+    driver: bridge
+
